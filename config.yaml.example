@@ -1,0 +1,15 @@
+default_provider: anthropic
+providers:
+  anthropic:
+    type: anthropic
+    api_key: YOUR_ANTHROPIC_KEY
+    model: claude-3-5-sonnet-20241022
+  openai:
+    type: openai
+    api_key: YOUR_OPENAI_KEY
+    base_url: https://api.openai.com/v1/chat/completions
+    model: gpt-4o
+  openai-responses:
+    type: openai-responses
+    api_key: YOUR_OPENAI_KEY
+    model: gpt-4o
