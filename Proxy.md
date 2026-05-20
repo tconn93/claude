@@ -19,7 +19,7 @@ export TARGET_API_URL="https://api.x.ai/v1/chat/completions"
 
 # Optional: Target Model (Defaults to gpt-4o)
 # For Grok:
-export TARGET_MODEL="grok-beta"
+export TARGET_MODEL="grok-4.3"
 
 # Optional: Port to listen on (default is 8081)
 export PROXY_PORT=8081

@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// Simplified types for the standalone proxy
+// Anthropic types
 type AnthropicRequest struct {
 	Model     string    `json:"model"`
 	Messages  []Message `json:"messages"`
@@ -51,73 +51,103 @@ type Tool struct {
 	InputSchema map[string]any `json:"input_schema"`
 }
 
-type OpenAIRequest struct {
-	Model     string          `json:"model"`
-	Messages  []OpenAIMessage `json:"messages"`
-	Tools     []OpenAITool    `json:"tools,omitempty"`
-	Stream    bool            `json:"stream,omitempty"`
+// OpenAI Chat Completions types
+type ChatRequest struct {
+	Model    string          `json:"model"`
+	Messages []ChatMessage   `json:"messages"`
+	Tools    []ChatTool      `json:"tools,omitempty"`
+	Stream   bool            `json:"stream,omitempty"`
 }
 
-type OpenAIMessage struct {
-	Role       string           `json:"role"`
-	Content    any              `json:"content,omitempty"`
-	ToolCalls  []OpenAIToolCall `json:"tool_calls,omitempty"`
-	ToolCallID string           `json:"tool_call_id,omitempty"`
+type ChatMessage struct {
+	Role       string         `json:"role"`
+	Content    any            `json:"content,omitempty"`
+	ToolCalls  []ChatToolCall `json:"tool_calls,omitempty"`
+	ToolCallID string         `json:"tool_call_id,omitempty"`
 }
 
-type OpenAITool struct {
-	Type     string         `json:"type"`
-	Function OpenAIFunction `json:"function"`
+type ChatTool struct {
+	Type     string       `json:"type"`
+	Function ChatFunction `json:"function"`
 }
 
-type OpenAIFunction struct {
+type ChatFunction struct {
 	Name        string         `json:"name"`
 	Description string         `json:"description,omitempty"`
 	Parameters  map[string]any `json:"parameters,omitempty"`
 }
 
-type OpenAIToolCall struct {
-	ID       string         `json:"id"`
-	Type     string         `json:"type"`
-	Function OpenAICallFunc `json:"function"`
+type ChatToolCall struct {
+	ID       string       `json:"id"`
+	Type     string       `json:"type"`
+	Function ChatCallFunc `json:"function"`
 }
 
-type OpenAICallFunc struct {
+type ChatCallFunc struct {
 	Name      string `json:"name"`
 	Arguments string `json:"arguments"`
 }
 
-type OpenAIResponseRequest struct {
-	Model  string       `json:"model"`
-	Input  []OpenAIItem `json:"input"`
-	Tools  []OpenAITool `json:"tools,omitempty"`
-	Stream bool         `json:"stream,omitempty"`
-	Store  bool         `json:"store,omitempty"`
+type ChatResponse struct {
+	ID      string `json:"id"`
+	Object  string `json:"object"`
+	Model   string `json:"model"`
+	Choices []struct {
+		Index   int         `json:"index"`
+		Message ChatMessage `json:"message"`
+	} `json:"choices"`
+	Usage struct {
+		PromptTokens     int `json:"prompt_tokens"`
+		CompletionTokens int `json:"completion_tokens"`
+		TotalTokens      int `json:"total_tokens"`
+	} `json:"usage"`
 }
 
-type OpenAIItem struct {
+// OpenAI Responses API types
+type ResponsesRequest struct {
+	Model        string             `json:"model"`
+	Input        any                `json:"input"`
+	Instructions string             `json:"instructions,omitempty"`
+	Tools        []ChatTool         `json:"tools,omitempty"`
+	Stream       bool               `json:"stream,omitempty"`
+	Store        bool               `json:"store,omitempty"`
+}
+
+type ResponsesInputItem struct {
 	Type      string               `json:"type"`
 	Role      string               `json:"role,omitempty"`
-	Content   []OpenAIContentPart `json:"content,omitempty"`
+	Content   []ResponsesContentPart `json:"content,omitempty"`
 	CallID    string               `json:"call_id,omitempty"`
 	Name      string               `json:"name,omitempty"`
 	Arguments string               `json:"arguments,omitempty"`
 	Output    string               `json:"output,omitempty"`
 }
 
-type OpenAIContentPart struct {
+type ResponsesContentPart struct {
 	Type string `json:"type"`
 	Text string `json:"text,omitempty"`
 }
 
-type OpenAIResponseObject struct {
-	ID     string       `json:"id"`
-	Object string       `json:"object"`
-	Output []OpenAIItem `json:"output"`
+type ResponsesResponse struct {
+	ID     string                `json:"id"`
+	Object string                `json:"object"`
+	Output []ResponsesOutputItem `json:"output"`
 	Usage  struct {
 		InputTokens  int `json:"input_tokens"`
 		OutputTokens int `json:"output_tokens"`
 	} `json:"usage"`
+}
+
+type ResponsesOutputItem struct {
+	ID      string               `json:"id"`
+	Type    string               `json:"type"`
+	Role    string               `json:"role,omitempty"`
+	Content []ResponsesContentPart `json:"content,omitempty"`
+	Status  string               `json:"status,omitempty"`
+	// For function_call items in output
+	CallID    string `json:"call_id,omitempty"`
+	Name      string `json:"name,omitempty"`
+	Arguments string `json:"arguments,omitempty"`
 }
 
 func main() {
@@ -128,7 +158,7 @@ func main() {
 
 	http.HandleFunc("/v1/messages", handleAnthropicToTarget)
 
-	fmt.Printf("Standalone Anthropic-to-OpenAI Proxy (Responses API) starting on :%s\n", port)
+	fmt.Printf("Anthropic-to-Target Proxy starting on :%s\n", port)
 	fmt.Printf("Target API URL: %s\n", getTargetURL())
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
@@ -163,22 +193,21 @@ func handleAnthropicToTarget(w http.ResponseWriter, r *http.Request) {
 	}
 
 	targetURL := getTargetURL()
-	
+	useResponses := strings.Contains(targetURL, "/responses")
+
 	var body []byte
-	if strings.Contains(targetURL, "/responses") {
-		oaiReq := translateToResponses(anthroReq)
-		body, _ = json.Marshal(oaiReq)
+	if useResponses {
+		body, _ = json.Marshal(translateToResponses(anthroReq))
 	} else {
-		oaiReq := translateToChatCompletions(anthroReq)
-		body, _ = json.Marshal(oaiReq)
+		body, _ = json.Marshal(translateToChat(anthroReq))
 	}
-	
+
 	req, err := http.NewRequestWithContext(r.Context(), "POST", targetURL, bytes.NewReader(body))
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to create request: %v", err), http.StatusInternalServerError)
 		return
 	}
-	
+
 	req.Header.Set("Authorization", "Bearer "+apiKey)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -189,185 +218,249 @@ func handleAnthropicToTarget(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	if !strings.Contains(targetURL, "/responses") {
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		http.Error(w, "Failed to read response", http.StatusInternalServerError)
+		return
+	}
+
+	if resp.StatusCode >= 400 {
+		log.Printf("Upstream error %d: %s", resp.StatusCode, string(respBody))
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(resp.StatusCode)
-		io.Copy(w, resp.Body)
+		w.Write(respBody)
 		return
 	}
 
-	// Translate Response back to Anthropic format
-	var oaiResp OpenAIResponseObject
-	if err := json.NewDecoder(resp.Body).Decode(&oaiResp); err != nil {
-		http.Error(w, "Failed to decode OpenAI response", http.StatusInternalServerError)
+	if useResponses {
+		var rResp ResponsesResponse
+		if err := json.Unmarshal(respBody, &rResp); err != nil {
+			log.Printf("Failed to decode response: %v\nBody: %s", err, string(respBody))
+			http.Error(w, "Failed to decode response", http.StatusInternalServerError)
+			return
+		}
+		anthroResp := translateFromResponses(rResp)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(anthroResp)
 		return
 	}
 
-	anthroResp := translateFromResponses(oaiResp)
+	// Chat Completions path
+	var chatResp ChatResponse
+	if err := json.Unmarshal(respBody, &chatResp); err != nil {
+		log.Printf("Failed to decode chat response: %v\nBody: %s", err, string(respBody))
+		http.Error(w, "Failed to decode chat response", http.StatusInternalServerError)
+		return
+	}
+	anthroResp := translateFromChat(chatResp)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(anthroResp)
 }
 
-func translateToResponses(req AnthropicRequest) OpenAIResponseRequest {
+func translateToResponses(req AnthropicRequest) ResponsesRequest {
 	targetModel := os.Getenv("TARGET_MODEL")
 	if targetModel == "" {
 		targetModel = "gpt-4o"
 	}
 
-	oaiReq := OpenAIResponseRequest{
-		Model:  targetModel,
-		Stream: req.Stream,
-		Store:  true,
+	r := ResponsesRequest{
+		Model:        targetModel,
+		Instructions: req.System,
+		Stream:       req.Stream,
+		Store:        true,
 	}
 
-	if req.System != "" {
-		oaiReq.Input = append(oaiReq.Input, OpenAIItem{
-			Type: "message",
-			Role: "system",
-			Content: []OpenAIContentPart{{Type: "text", Text: req.System}},
-		})
-	}
-
+	// Build input array using input_text / function_call / function_call_output items.
+	// xAI's Responses API uses the OpenAI Responses API input item types.
+	var input []ResponsesInputItem
 	for _, msg := range req.Messages {
 		for _, block := range msg.Content {
 			switch block.Type {
 			case "text":
-				oaiReq.Input = append(oaiReq.Input, OpenAIItem{
-					Type: "message",
+				input = append(input, ResponsesInputItem{
+					Type: "input_text",
 					Role: msg.Role,
-					Content: []OpenAIContentPart{{Type: "text", Text: block.Text}},
+					Content: []ResponsesContentPart{{Type: "input_text", Text: block.Text}},
 				})
 			case "tool_use":
 				args, _ := json.Marshal(block.ToolUse.Input)
-				oaiReq.Input = append(oaiReq.Input, OpenAIItem{
+				input = append(input, ResponsesInputItem{
 					Type:      "function_call",
 					CallID:    block.ToolUse.ID,
 					Name:      block.ToolUse.Name,
 					Arguments: string(args),
 				})
 			case "tool_result":
-				oaiReq.Input = append(oaiReq.Input, OpenAIItem{
+				input = append(input, ResponsesInputItem{
 					Type:   "function_call_output",
 					CallID: block.ToolRes.ToolUseID,
-					Output: block.Content,
+					Output: block.ToolRes.Content,
 				})
 			}
 		}
 	}
 
+	if len(input) > 0 {
+		r.Input = input
+	}
 	for _, tool := range req.Tools {
-		oaiReq.Tools = append(oaiReq.Tools, OpenAITool{
+		r.Tools = append(r.Tools, ChatTool{
 			Type: "function",
-			Function: OpenAIFunction{
+			Function: ChatFunction{
 				Name:        tool.Name,
 				Description: tool.Description,
 				Parameters:  tool.InputSchema,
 			},
 		})
 	}
-
-	return oaiReq
+	return r
 }
 
-func translateToChatCompletions(req AnthropicRequest) OpenAIRequest {
+func translateToChat(req AnthropicRequest) ChatRequest {
 	targetModel := os.Getenv("TARGET_MODEL")
 	if targetModel == "" {
 		targetModel = "gpt-4o"
 	}
 
-	oaiReq := OpenAIRequest{
+	c := ChatRequest{
 		Model:  targetModel,
 		Stream: req.Stream,
 	}
 
 	if req.System != "" {
-		oaiReq.Messages = append(oaiReq.Messages, OpenAIMessage{
+		c.Messages = append(c.Messages, ChatMessage{
 			Role:    "system",
 			Content: req.System,
 		})
 	}
 
 	for _, msg := range req.Messages {
-		oaiMsg := OpenAIMessage{
-			Role: msg.Role,
-		}
-
+		cm := ChatMessage{Role: msg.Role}
 		var textParts []string
+
 		for _, block := range msg.Content {
 			switch block.Type {
 			case "text":
 				textParts = append(textParts, block.Text)
 			case "tool_use":
-				oaiMsg.ToolCalls = append(oaiMsg.ToolCalls, OpenAIToolCall{
+				args, _ := json.Marshal(block.ToolUse.Input)
+				cm.ToolCalls = append(cm.ToolCalls, ChatToolCall{
 					ID:   block.ToolUse.ID,
 					Type: "function",
-					Function: OpenAICallFunc{
+					Function: ChatCallFunc{
 						Name:      block.ToolUse.Name,
-						Arguments: "{}", 
+						Arguments: string(args),
 					},
 				})
 			case "tool_result":
-				oaiMsg.Role = "tool"
-				oaiMsg.ToolCallID = block.ToolRes.ToolUseID
-				oaiMsg.Content = block.Content
+				cm.Role = "tool"
+				cm.ToolCallID = block.ToolRes.ToolUseID
+				cm.Content = block.ToolRes.Content
 			}
 		}
-		
-		if oaiMsg.Role != "tool" {
-			oaiMsg.Content = strings.Join(textParts, "\n")
+
+		if cm.Role != "tool" {
+			cm.Content = strings.Join(textParts, "\n")
 		}
-		
-		oaiReq.Messages = append(oaiReq.Messages, oaiMsg)
+		c.Messages = append(c.Messages, cm)
 	}
 
 	for _, tool := range req.Tools {
-		oaiReq.Tools = append(oaiReq.Tools, OpenAITool{
+		c.Tools = append(c.Tools, ChatTool{
 			Type: "function",
-			Function: OpenAIFunction{
+			Function: ChatFunction{
 				Name:        tool.Name,
 				Description: tool.Description,
 				Parameters:  tool.InputSchema,
 			},
 		})
 	}
-
-	return oaiReq
+	return c
 }
 
-func translateFromResponses(oaiResp OpenAIResponseObject) any {
-	// Map back to Anthropic Messages response format
+func translateFromResponses(r ResponsesResponse) any {
 	resp := map[string]any{
-		"id":    oaiResp.ID,
-		"type":  "message",
-		"role":  "assistant",
-		"model": "claude-3-5-sonnet", // Identity theft for compatibility
+		"id":      r.ID,
+		"type":    "message",
+		"role":    "assistant",
+		"model":   "claude-sonnet-4-6",
+		"stop_reason": "end_turn",
 		"content": []any{},
 		"usage": map[string]any{
-			"input_tokens":  oaiResp.Usage.InputTokens,
-			"output_tokens": oaiResp.Usage.OutputTokens,
+			"input_tokens":  r.Usage.InputTokens,
+			"output_tokens": r.Usage.OutputTokens,
 		},
 	}
 
-	content := []any{}
-	for _, item := range oaiResp.Output {
-		if item.Type == "message" {
+	var content []any
+	for _, item := range r.Output {
+		switch item.Type {
+		case "message":
 			for _, part := range item.Content {
 				content = append(content, map[string]any{
 					"type": "text",
 					"text": part.Text,
 				})
 			}
-		} else if item.Type == "function_call" {
+		case "function_call":
 			var input map[string]any
 			json.Unmarshal([]byte(item.Arguments), &input)
 			content = append(content, map[string]any{
-				"type": "tool_use",
-				"id":   item.CallID,
-				"name": item.Name,
+				"type":  "tool_use",
+				"id":    item.CallID,
+				"name":  item.Name,
 				"input": input,
 			})
 		}
 	}
+	resp["content"] = content
+	return resp
+}
+
+func translateFromChat(r ChatResponse) any {
+	resp := map[string]any{
+		"id":      r.ID,
+		"type":    "message",
+		"role":    "assistant",
+		"model":   "claude-sonnet-4-6",
+		"stop_reason": "end_turn",
+		"content": []any{},
+		"usage": map[string]any{
+			"input_tokens":  r.Usage.PromptTokens,
+			"output_tokens": r.Usage.CompletionTokens,
+		},
+	}
+
+	if len(r.Choices) == 0 {
+		return resp
+	}
+
+	msg := r.Choices[0].Message
+	var content []any
+
+	if msg.Content != nil {
+		switch v := msg.Content.(type) {
+		case string:
+			if v != "" {
+				content = append(content, map[string]any{
+					"type": "text",
+					"text": v,
+				})
+			}
+		}
+	}
+
+	for _, tc := range msg.ToolCalls {
+		var input map[string]any
+		json.Unmarshal([]byte(tc.Function.Arguments), &input)
+		content = append(content, map[string]any{
+			"type":  "tool_use",
+			"id":    tc.ID,
+			"name":  tc.Function.Name,
+			"input": input,
+		})
+	}
+
 	resp["content"] = content
 	return resp
 }

@@ -22,8 +22,8 @@ A high-performance, production-ready port of Anthropic's Claude Code CLI, rewrit
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/tyler/claude-code-go
-   cd claude-code-go
+   git clone https://github.com/tconn93/claude
+   cd claude
    ```
 
 2. Initialize dependencies:

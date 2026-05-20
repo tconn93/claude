@@ -1,0 +1,11 @@
+export const FILE_READ_PROMPT = `# File Reading Guidelines
+- Use file_path with absolute paths for reliable access
+- Use offset and limit to read specific portions of large files
+- Default limit is 2000 lines; use offset to read beyond that
+- Binary files are detected automatically and cannot be read as text
+- Image files (PNG, JPG, GIF, etc.) are rendered visually
+- PDF files can be read with page ranges
+- The tool returns content with line numbers for easy reference
+- Do not re-read files you just edited to verify changes
+- Use Glob or Grep to find files before reading them
+- Consider reading multiple independent files in parallel`;

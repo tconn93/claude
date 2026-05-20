@@ -1,0 +1,549 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1778696051438,
+  "projectRoot": "/mnt/c/Users/tyler/claude",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      },
+      {
+        "name": "C/C++",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "Makefile"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "react",
+        "version": "19.0.0",
+        "category": "frontend"
+      },
+      {
+        "name": "esbuild",
+        "version": "0.25.0",
+        "category": "build"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": "find /mnt/c/Users/tyler/claude -maxdepth 2 -name '*.config.*' -o -name '.eslintrc*' -o -name '.prettierrc*' -o -name 'jest*' -o -name 'vitest*' -o -name 'Makefile' -o -name 'Dockerfile' -o -name '*.toml' -o -name '.node-version' -o -name '.nvmrc' -o -name '.npmrc' -o -name 'lerna.json' -o -name 'nx.json' | sort",
+    "lintCommand": "npm run lint",
+    "devCommand": null,
+    "scripts": {
+      "build": "bun scripts/build-bundle.ts",
+      "build:watch": "bun scripts/build-bundle.ts --watch",
+      "build:prod": "bun scripts/build-bundle.ts --minify",
+      "build:web": "bun scripts/build-web.ts",
+      "build:web:watch": "bun scripts/build-web.ts --watch",
+      "build:web:prod": "bun scripts/build-web.ts --minify",
+      "typecheck": "tsc --noEmit",
+      "lint": "biome check src/",
+      "lint:fix": "biome check --write src/",
+      "format": "biome format --write src/",
+      "check": "biome check src/ && tsc --noEmit"
+    }
+  },
+  "conventions": {
+    "namingStyle": "camelCase/PascalCase",
+    "importStyle": "ES modules",
+    "testPattern": null,
+    "fileOrganization": "type-based"
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs",
+      "scripts",
+      "src"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "claude-code-go": {
+      "path": "claude-code-go",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1778696051393,
+      "keyFiles": [
+        "go.mod",
+        "go.sum"
+      ]
+    },
+    "docker": {
+      "path": "docker",
+      "purpose": null,
+      "fileCount": 4,
+      "lastAccessed": 1778696051396,
+      "keyFiles": [
+        "Dockerfile",
+        "docker-compose.yml",
+        "entrypoint.sh"
+      ]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 6,
+      "lastAccessed": 1778696051398,
+      "keyFiles": [
+        "architecture.md",
+        "bridge.md",
+        "commands.md",
+        "exploration-guide.md",
+        "subsystems.md"
+      ]
+    },
+    "mcp-server": {
+      "path": "mcp-server",
+      "purpose": null,
+      "fileCount": 9,
+      "lastAccessed": 1778696051401,
+      "keyFiles": [
+        "Dockerfile",
+        "README.md",
+        "package-lock.json",
+        "package.json",
+        "railway.json"
+      ]
+    },
+    "prompts": {
+      "path": "prompts",
+      "purpose": null,
+      "fileCount": 17,
+      "lastAccessed": 1778696051403,
+      "keyFiles": [
+        "00-overview.md",
+        "01-install-bun-and-deps.md",
+        "02-runtime-shims.md",
+        "03-build-config.md",
+        "04-fix-mcp-server.md"
+      ]
+    },
+    "proxy": {
+      "path": "proxy",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1778696051406,
+      "keyFiles": [
+        "README.md"
+      ]
+    },
+    "scripts": {
+      "path": "scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 13,
+      "lastAccessed": 1778696051408,
+      "keyFiles": [
+        "build-bundle.ts",
+        "build-web.ts",
+        "build.sh",
+        "bun-plugin-shims.ts",
+        "ci-build.sh"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 18,
+      "lastAccessed": 1778696051410,
+      "keyFiles": [
+        "QueryEngine.ts",
+        "Task.ts",
+        "Tool.ts",
+        "commands.ts",
+        "context.ts"
+      ]
+    },
+    "web": {
+      "path": "web",
+      "purpose": null,
+      "fileCount": 8,
+      "lastAccessed": 1778696051412,
+      "keyFiles": [
+        "next.config.ts",
+        "package-lock.json",
+        "package.json",
+        "postcss.config.js",
+        "tailwind.config.ts"
+      ]
+    },
+    "mcp-server/api": {
+      "path": "mcp-server/api",
+      "purpose": "API routes",
+      "fileCount": 2,
+      "lastAccessed": 1778696051421,
+      "keyFiles": [
+        "index.ts",
+        "vercelApp.ts"
+      ]
+    },
+    "mcp-server/src": {
+      "path": "mcp-server/src",
+      "purpose": "Source code",
+      "fileCount": 4,
+      "lastAccessed": 1778696051425,
+      "keyFiles": [
+        "http.ts",
+        "index.ts",
+        "index.ts.new"
+      ]
+    },
+    "web/app": {
+      "path": "web/app",
+      "purpose": "Application code",
+      "fileCount": 3,
+      "lastAccessed": 1778696051433,
+      "keyFiles": [
+        "globals.css",
+        "layout.tsx",
+        "page.tsx"
+      ]
+    },
+    "web/components": {
+      "path": "web/components",
+      "purpose": "UI components",
+      "fileCount": 0,
+      "lastAccessed": 1778696051435,
+      "keyFiles": []
+    },
+    "web/lib": {
+      "path": "web/lib",
+      "purpose": "Library code",
+      "fileCount": 15,
+      "lastAccessed": 1778696051438,
+      "keyFiles": [
+        "ansi-to-html.ts",
+        "api.ts",
+        "browser-notifications.ts"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "proxy/cmd/proxy/main.go",
+      "accessCount": 13,
+      "lastAccessed": 1778697879956,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/tools/shared/toolHelpers.ts",
+      "accessCount": 8,
+      "lastAccessed": 1778700795155,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/types/message.ts",
+      "accessCount": 7,
+      "lastAccessed": 1778699753881,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/types/tool.ts",
+      "accessCount": 7,
+      "lastAccessed": 1778699755180,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/types/permissions.ts",
+      "accessCount": 7,
+      "lastAccessed": 1778699756537,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/constants/common.ts",
+      "accessCount": 7,
+      "lastAccessed": 1778699757790,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/state/types.ts",
+      "accessCount": 7,
+      "lastAccessed": 1778699759102,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/constants/prompts.ts",
+      "accessCount": 7,
+      "lastAccessed": 1778699788315,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/package.json",
+      "accessCount": 7,
+      "lastAccessed": 1778700157429,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/types/command.ts",
+      "accessCount": 6,
+      "lastAccessed": 1778699760565,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/tsconfig.json",
+      "accessCount": 6,
+      "lastAccessed": 1778699764498,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/types/hooks.ts",
+      "accessCount": 5,
+      "lastAccessed": 1778699761934,
+      "type": "file"
+    },
+    {
+      "path": "proxy/README.md",
+      "accessCount": 3,
+      "lastAccessed": 1778697049312,
+      "type": "file"
+    },
+    {
+      "path": "proxy/go.mod",
+      "accessCount": 2,
+      "lastAccessed": 1778697050584,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/utils/shell.ts",
+      "accessCount": 2,
+      "lastAccessed": 1778699726692,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/tools/BashTool/types.ts",
+      "accessCount": 2,
+      "lastAccessed": 1778699729575,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/tools/shared/gitOperations.ts",
+      "accessCount": 2,
+      "lastAccessed": 1778699730956,
+      "type": "file"
+    },
+    {
+      "path": "package.json",
+      "accessCount": 1,
+      "lastAccessed": 1778699257456,
+      "type": "file"
+    },
+    {
+      "path": "tsconfig.json",
+      "accessCount": 1,
+      "lastAccessed": 1778699258746,
+      "type": "file"
+    },
+    {
+      "path": "src/entrypoints/cli.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1778699260548,
+      "type": "file"
+    },
+    {
+      "path": "src/Tool.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699271818,
+      "type": "file"
+    },
+    {
+      "path": "src/tools.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699273463,
+      "type": "file"
+    },
+    {
+      "path": "src/commands.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699275126,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/PermsList.md",
+      "accessCount": 1,
+      "lastAccessed": 1778699344217,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/utils/shell/ShellCommand.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699726568,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/commands/help/index.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699730849,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/tools/BashTool/security.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699731831,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/services/api/client.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699734544,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/commands/clear/index.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699735378,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/tools/BashTool/prompt.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699739590,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/tools/FileReadTool/types.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699743908,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/tools/FileReadTool/prompt.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699750010,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/commands/config/index.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699750333,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/utils/shell/Shell.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699751207,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/services/api/retry.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699752133,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/tools/FileWriteTool/types.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699752695,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/tools/FileWriteTool/prompt.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699757875,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/commands/context/index.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699759156,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/tools/FileEditTool/types.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699760751,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/tools/FileEditTool/prompt.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699766411,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/tools/GlobTool/types.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699772841,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/scripts/dev.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699774080,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/commands/cost/index.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699775311,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/tools/GrepTool/types.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699776409,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/tools/WebFetchTool/types.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699778829,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/services/api/errors.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699779029,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/tools/WebSearchTool/types.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699781749,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/biome.json",
+      "accessCount": 1,
+      "lastAccessed": 1778699785476,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/state/store.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699789585,
+      "type": "file"
+    },
+    {
+      "path": "tcoder/src/tools/TaskTool/types.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778699790503,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

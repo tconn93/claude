@@ -1,0 +1,13 @@
+export const BASH_PROMPT = `# Bash Tool Guidelines
+- Use Bash for shell operations, package management, git commands, and running scripts
+- Prefer dedicated code tools (Read, Write, Edit, Glob, Grep) for file operations
+- Commands run in a sandboxed environment with configurable timeouts
+- Output is captured and returned as text; interactive programs will not work
+- Commands run in the working directory unless specified otherwise
+- Environment variables are isolated from the host system
+- Dangerous commands (rm -rf /, dd, mkfs, fork bombs) are blocked
+- Use -y or --yes flags with package managers to avoid prompts
+- Use --json or --porcelain flags when available for machine-readable output
+- Long-running commands should use reasonable timeouts
+- Chain related commands with && rather than running separately
+- Use descriptive command names via the description parameter`;
